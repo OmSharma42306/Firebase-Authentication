@@ -1,9 +1,12 @@
 import { useState } from 'react'
-import {getAuth,signInWithEmailAndPassword,GoogleAuthProvider,createUserWithEmailAndPassword, signInWithPopup} from "firebase/auth"
+import {getAuth,signInWithEmailAndPassword,GoogleAuthProvider,createUserWithEmailAndPassword, signInWithPopup,signOut} from "firebase/auth"
 import app from './config/firebase-config';
+import { useNavigate } from 'react-router-dom';
 function App() {
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState("");
+  const [user,setUser] = useState(false);
+  const navigate  = useNavigate();
   const auth = getAuth(app);
   const signUp = async(email,password) =>{
     try{
@@ -20,7 +23,10 @@ function App() {
     try{
       const userCredential = await signInWithEmailAndPassword(auth,email,password);
       console.log("User signin!",userCredential.user)
+      setUser(true);
       alert("SignIn Successful!")
+      navigate("/landing")
+
     }catch(error){
       console.error("Error : ",error);
       alert("SignIN Failed!")
@@ -37,9 +43,28 @@ function App() {
       alert("User Signed in With Google: ");
       console.log("User Signed in With Google!",user);
       console.log("ID Token:",idToken);
+      navigate("/landing")
+      setUser(true);
+      // const responce = await fetch("http://localhost:3000/secure",{
+      //   method:"GET",
+      //   headers:{
+      //     Authorization : `Bearer ${idToken}`
+      //   }
+      // });
+      // const data = await responce.json();
+      // console.log("Secure Api Responce",data)
       
     }catch(error){
         console.error("Error Signing in With Google :",error.message);
+    }
+  }
+
+  const logout = async () =>{
+    try{
+      await signOut(auth);
+      setUser(null);
+    }catch(error){
+      console.error("Error during logout",error)
     }
   }
 
