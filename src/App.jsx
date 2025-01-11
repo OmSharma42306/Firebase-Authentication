@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import {getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword} from "firebase/auth"
+import {getAuth,signInWithEmailAndPassword,GoogleAuthProvider,createUserWithEmailAndPassword, signInWithPopup} from "firebase/auth"
 import app from './config/firebase-config';
 function App() {
   const [email,setEmail] = useState("");
@@ -26,6 +26,23 @@ function App() {
       alert("SignIN Failed!")
     }
   }
+
+  // Google SignIn
+  const googleSignIn = async() =>{
+    const provider = new GoogleAuthProvider();
+    try{
+      const result = await signInWithPopup(auth,provider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+      alert("User Signed in With Google: ");
+      console.log("User Signed in With Google!",user);
+      console.log("ID Token:",idToken);
+      
+    }catch(error){
+        console.error("Error Signing in With Google :",error.message);
+    }
+  }
+
   return (
     <>
     <input type="text" placeholder="Enter Your Email" onChange={(e)=>{
@@ -44,8 +61,15 @@ function App() {
     <button onClick={()=>{
       signIn(email,password);
     }}>SignIn</button>
+    
+    
+    <h1>Signin With Google!</h1>
+    <button onClick={googleSignIn}>SignIn with Google</button>
+    
+    
     </>
 
+    
   )
 }
 
